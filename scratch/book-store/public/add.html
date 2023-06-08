@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Add Book</title>
+    <!-- Add Bootstrap CSS -->
+    <link rel="stylesheet" 
+					href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="index.html">BookApp</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="search.html">Search</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="add.html">Add</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="update.html">Update</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="delete.html">Delete</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1>Add Book</h1>
+        <form id="add-form" onsubmit="submitForm(event)">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input type="text" id="title" class="form-control" 
+												placeholder="Enter book title">
+            </div>
+            <div class="form-group">
+                <label for="author">Author</label>
+                <input type="text" id="author" class="form-control" 
+												placeholder="Enter author's name">
+            </div>
+            <div class="form-group">
+                <label for="numPrice">Price</label>
+                <input type="number" id="numPrice" class="form-control" 
+												placeholder="Enter number of price">
+            </div>
+            <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+        <div id="add-results"></div>
+    </div>
+
+    <script>
+        
+        /* function declarations */
+
+        function submitForm(event){
+            event.preventDefault();
+            const newBook = getFormData();
+            sendData(newBook);
+        }
+
+        function getFormData(){
+            return {
+                title: form.title.value,
+                author: form.author.value,
+                price: form.price.value
+            };
+        }
+
+        function updateUI(data){
+            addResultsDiv.textContent = JSON.stringify(data);
+        }
+
+        function sendData(data){
+            fetch('/books', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateUI(data);
+            });
+        }
+
+
+       /* setup and function calls */
+       const form = document.getElementById("add-form");
+       const addResultsDiv = document.getElementById("add-results");
+       form.reset();
+
+    </script>
+</body>
+</html>
