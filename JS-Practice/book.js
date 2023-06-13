@@ -1,19 +1,32 @@
 
 class Book{
-    constructor(title, author, pages, isCheckedOut, dueDate){
+    constructor(title, author, pages, dueDate, isCheckedOut){
         this.title = title;
         this.author = author;
         this.pages = pages;
-        this.isCheckedOut = isCheckedOut;
-        this.dueDate = dueDate;
+        this.dueDate = null
+        this.isCheckedOut = false;
     }
 
     checkOut(){
-        this.isCheckedOut = true;
+        if(this.isCheckedOut){
+            console.log("book is checked out");
+        }else{
+            this.isCheckedOut = true;
+            this.dueDate = new Date();
+            this.dueDate.setDate(this.dueDate.getDate() + 14);
+            // console.log("book  has been checked out.");
+        }
     }
     
     checkIn(){
-        this.isCheckedOut = false;
+        if(!this.isCheckedOut){
+            console.log("books already checked in")
+        }else{
+            this.isCheckedOut = false;
+            this.dueDate = null;
+            console.log("book checked in");
+        }
     }
 }
 
