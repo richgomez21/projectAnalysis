@@ -53,7 +53,20 @@
 
     <script>
         /* function declarations */
-
+        function updateUI(book){
+        const listItem = document.createElement("li");
+        listItem.textContent = book.title;
+        bookList.appendChild(listItem);
+    }
+        function getData(){
+        fetch('https://www.themealdb.com')
+        .then(response => response.json())
+        .then(meal => {
+            meal.forEach(indivBook => {
+            
+            });
+        });
+    }
 				/* setup and function calls */
     </script>
 </body>
