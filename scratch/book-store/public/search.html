@@ -15,6 +15,9 @@
                     <a class="nav-link" href="search.html">Search</a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="book.html">Single Book</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="add.html">Add</a>
                 </li>
                 <li class="nav-item">
@@ -47,25 +50,27 @@
         function updateUI(data){
             searchResultsDiv.textContent = JSON.stringify(data);
         }
-        
-        function search(){
-            fetch(`http://localhost:3000/books/search?title=${title}`)
-                    .then(response => response.json())
-                    .then(book => {
-                        updateUI(book);
+
+        function search(title){
+            fetch(`/books/search?title=${title}`)
+                .then(response => response.json())
+                .then(book => {
+                    updateUI(book);
             });
         }
 
         function submitForm(event){
             event.preventDefault();
-            const title = form.title.value
-            search(title);
+            const title = form.title.value;
+            search(title);            
             form.reset();
         }
 
         /* setup and function calls */
         const form = document.getElementById("search-form");
         const searchResultsDiv = document.getElementById('search-results');
+        form.reset();
+
     </script>
 </body>
 </html>

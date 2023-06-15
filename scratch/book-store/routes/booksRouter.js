@@ -21,6 +21,7 @@ router.get('/', (req, res) => {
 //GET localhost:3000/books/search?title={title}
 router.get('/search', (req, res) => {
     const bookTitle = req.query.title;
+    // search
     const book = books.find(b => b.title === bookTitle);
     if(book){
         res.json(book)
@@ -28,6 +29,24 @@ router.get('/search', (req, res) => {
         res.status(404).send();
     }
 });
+
+//GET localhost:3000/books/id
+router.get('/:id', (req, res) => {
+    // get id from path params
+    const bookId = parseInt(req.params.id);
+    // look through array to find book with id passed
+    const book = books.find(indivBook => indivBook === book.id);
+
+    if(book){
+        //if found, send down
+        res.json(book);
+    }else{
+        //else, throw error
+        res.status(404).json({error: 'Book not found'})
+    }
+    
+    res.send();
+ })
 
 //POST localhost:3000
 router.post('/', (req, res) => {
@@ -43,11 +62,16 @@ router.post('/', (req, res) => {
             console.log('successfully wrote file')
         }
     });
-
-
    res.status(201).json({success: true, message: "Book created successfully"});
 
  });
+
+ router.put('/:id', (req, res) => {
+    
+
+ });
+
+ 
 
 
 
