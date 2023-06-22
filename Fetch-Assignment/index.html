@@ -36,7 +36,7 @@
     <div class="container my-4">
         <h1 class="text-center mb-4">Meal by Name</h1>
 
-        <form id="meal-form" class="row justify-content-center" onsubmit="getMealDetails();">
+        <form id="meal-form" class="row justify-content-center" onsubmit="getMealDetails(event);">
             <div class="col-md-6">
                 <select name="mealSelect" id="mealSelect" class="form-control mb-2">
                     <!-- Options will be added here by JavaScript -->
@@ -55,27 +55,41 @@
 
     <script>
         /* function declarations */
-        function updateUI(meal){
-        const listItem = document.createElement("li");
-        listItem.textContent = book.title;
-        bookList.appendChild(listItem);
-    }
-        function getData(){
-        fetch('https://www.themealdb.com')
-        .then(response => response.json())
-        .then(meal => {
-            meal.forEach(indivBook => {
-            
-            });
-        });
-    }
-				/* setup and function calls */
+      
 
-        
-        
+        function populateDropdown(meal){
+            const option = document.createElement('option');
+            option.value = meal.idMeal;
+            option.textContent = meal.strMeal;
+            mealSelect.appendChild(option);
+        }
+
+        function getMealDetails(event){
+            event.preventDefault();
+            fetch('https://www.themealdb.com/api/json/v1/1/search.php?s={mealName}')
+            .then(response => response.json())
+                .then(obj => {
+                    console.log(obj);
+                 });
+        }
+
+        function getData(){
+            for(let i = 0; i < 10; i++){
+             fetch('https://www.themealdb.com/api/json/v1/1/random.php')
+                .then(response => response.json())
+                .then(data => {
+                    const meal = data.meals[0];
+                    populateDropdown(meal);
+                   
+                 });
+            }
+        }
 
 		/* setup and function calls */
-        const form = document.getElementById("meal-form");
+        const mealDetails = document.getElementById("meal-details")
+        const mealSelect = document.getElementById("mealSelect");
+        getMealDetails();
+        getData();
     </script>
 </body>
 </html>
