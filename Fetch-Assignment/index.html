@@ -59,22 +59,49 @@
 
         function populateDropdown(meal){
             const option = document.createElement('option');
-            option.value = meal.idMeal;
+            option.value = meal.strMeal;
             option.textContent = meal.strMeal;
-            option.setAttribute('data-image', meal.strMealThumb); // Add the image URL as a custom attribute
             mealSelect.appendChild(option);
         }
         
+        function updateUI(meal){
+           mealDetails.innerHTML = '';
+            
+           let mealTitle = document.createElement('h2');
+           let mealImg = document.createElement('img');
+           let details = document.createElement('p');
+           
 
+            mealTitle.textContent = meal.strMeal;
+            mealImg.innerHTML = `<img src="${mealDetails.strMealThumb}" class="img-fluid mb-4">`
+            details.textContent = meal.strInstructions;
+
+            mealDetails.appendChild(mealTitle);
+            mealDetails.appendChild(mealImg);
+            mealDetails.appendChild(details);
+
+        }
+
+
+        function sendRequest(mealName){
+            // event.preventDefault();
+            
+            fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${mealName}`)
+            .then(response => response.json())
+                .then(data => {
+                    let mealDetails = data.meals[0];
+                    updateUI(mealDetails);
+                 })
+                    .catch(error => {
+                    console.log("ERROR", error)
+                });
+        }
 
         function getMealDetails(event){
             event.preventDefault();
-            fetch('https://www.themealdb.com/api/json/v1/1/search.php?s={mealName}')
-            .then(response => response.json())
-                .then(obj => {
-                    console.log(obj);
-                 });
+            sendRequest(mealSelect.value);
         }
+
 
         function getData(){
             for(let i = 0; i < 10; i++){
@@ -83,15 +110,15 @@
                 .then(data => {
                     const meal = data.meals[0];
                     populateDropdown(meal);
-                   
-                 });
+                 })
+                
             }
         }
 
 		/* setup and function calls */
         const mealDetails = document.getElementById("meal-details")
         const mealSelect = document.getElementById("mealSelect");
-        getMealDetails();
+        
         getData();
     </script>
 </body>
