@@ -61,8 +61,11 @@
             const option = document.createElement('option');
             option.value = meal.idMeal;
             option.textContent = meal.strMeal;
+            option.setAttribute('data-image', meal.strMealThumb); // Add the image URL as a custom attribute
             mealSelect.appendChild(option);
         }
+        
+
 
         function getMealDetails(event){
             event.preventDefault();
