@@ -56,7 +56,62 @@
     <script>
         /* function declarations */
 
+        function populateDropdown(meal){
+            const option = document.createElement('option');
+            option.value = meal.strArea;
+            option.textContent = meal.strArea;
+            areaSelect.appendChild(option);
+        }
+
+        function updateUI(meal){
+            
+           let list = document.createElement('li');
+           
+
+           list.textContent = meal.strMeal;
+
+           mealList.appendChild(list);
+
+        }
+
+        function getData(){
+             fetch('https://www.themealdb.com/api/json/v1/1/list.php?a=list')
+                .then(response => response.json())
+                .then(data => {
+                    // console.log(data);
+                    // const meal = data.meals;
+                    data.meals.forEach(meal => {
+                        populateDropdown(meal);
+                    });
+                 })
+        }
+
+        function sendRequest(area){
+            fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${area}`)
+            .then(response => response.json())
+                .then(data => {
+                    // console.log(data);
+                    data.meals.forEach(meal =>{
+                        // let mealDetails = data.meals;
+                        updateUI(meal);
+                    })
+                 })
+                    .catch(error => {
+                    console.log("ERROR", error)
+                });
+        }
+
+        function getMealsByArea(){
+            event.preventDefault();
+            sendRequest(areaSelect.value);
+        }
+
+
 				/* setup and function calls */
+            const areaSelect = document.getElementById("areaSelect");
+            const mealList = document.getElementById("meal-list"); 
+                
+            getData();
     </script>
 </body>
 </html>

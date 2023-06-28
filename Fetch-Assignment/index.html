@@ -73,7 +73,7 @@
            
 
             mealTitle.textContent = meal.strMeal;
-            mealImg.innerHTML = `<img src="${mealDetails.strMealThumb}" class="img-fluid mb-4">`
+            mealImg.src = meal.strMealThumb;
             details.textContent = meal.strInstructions;
 
             mealDetails.appendChild(mealTitle);

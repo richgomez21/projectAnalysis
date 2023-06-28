@@ -58,9 +58,61 @@
 
     <script>
 			/* function declarations */
+            function populateDropdown(meal){
+            const option = document.createElement('option');
+            option.value = meal.strCategory;
+            option.textContent = meal.strCategory;
+            catSelect.appendChild(option);
+        }
+
+        function updateUI(meal){
+            // catSelect.innerHTML = '';
             
+           let list = document.createElement('li');
+           
+
+           list.textContent = meal.strMeal;
+
+           mealList.appendChild(list);
+
+        }
+
+        function getData(){
+             fetch('https://www.themealdb.com/api/json/v1/1/list.php?c=list')
+                .then(response => response.json())
+                .then(data => {
+                    // console.log(data);
+                    // const meal = data.meals;
+                    data.meals.forEach(meal => {
+                        populateDropdown(meal);
+                    });
+                 })
+        }
+
+        function sendRequest(category){
+            fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`)
+            .then(response => response.json())
+                .then(data => {
+                    // console.log(data);
+                    data.meals.forEach(meal =>{
+                        // let mealDetails = data.meals;
+                        updateUI(meal);
+                    })
+                 })
+                    .catch(error => {
+                    console.log("ERROR", error)
+                });
+        }
+
+        function getMealsByCategory(){
+            event.preventDefault();
+            sendRequest(catSelect.value);
+        }
 
 			/* setup and function calls */
+            const catSelect = document.getElementById("categorySelect");
+            const mealList = document.getElementById("meal-list");
+            getData();
     </script>
 </body>
 </html>

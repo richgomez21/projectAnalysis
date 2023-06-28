@@ -53,8 +53,49 @@
 
     <script>
         /* function declarations */
+        function populateDropdown(meal){
+            const option = document.createElement('option');
+            option.value = meal.strCategory;
+            option.textContent = meal.strCategory;
+            catSelect.appendChild(option);
+        }
+
+        function updateUI(meal){
+            // catSelect.innerHTML = '';
+            
+           let list = document.createElement('li');
+           
+
+           list.textContent = meal.strMeal;
+
+           mealList.appendChild(list);
+
+        }
+
+        function sendRequest(ingredient){
+            fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${ingredient}`)
+            .then(response => response.json())
+                .then(data => {
+                    // console.log(data);
+                    data.meals.forEach(meal =>{
+                        // let mealDetails = data.meals;
+                        updateUI(meal);
+                    })
+                 })
+                    .catch(error => {
+                    console.log("ERROR", error)
+                });
+        }
+
+        function getMealsByIngredient(){
+            event.preventDefault();
+            sendRequest(ingredient.value);
+        }
 
 				/* setup and function calls */
+                const ingredient = document.getElementById("ingredientInput");
+                const mealList = document.getElementById("meal-list");
+
     </script>
 </body>
 </html>
