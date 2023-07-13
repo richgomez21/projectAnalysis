@@ -11,7 +11,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
-const userController = require('../routes/UserController');
+const userController = require('./routes/UserController');
 
 var app = express();
 
@@ -37,12 +37,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // use force: true to drop the tables and recreate them. Don't use this in production! For production, just remove { force: true }. You could also remove the then().
 //this is good to have here because the database will be synced *before* the application will start to handle routes.
-sequelize.sync({ force: true }) 
+sequelize.sync() 
     .then(() => {
         console.log("Database & tables created!");
     });
 
 app.use('/', indexRouter);
+app.use('/user', userController);
 // app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
