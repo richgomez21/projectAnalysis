@@ -1,8 +1,8 @@
-//Sequelize database setup
+// Sequelize database setup
 const sequelize = require('./database');
 // Interaction with session
 const session = require('express-session');
-const User = require("./models/User");
+const User = require('./models/User');
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');

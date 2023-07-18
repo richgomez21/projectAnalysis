@@ -19,7 +19,9 @@ async function login(event){
     const username = loginForm.username.value;
     const password = loginForm.password.value;
 
-    const response = await sendPostRequest('/user/login', { username, password });
+    const postBody = { username: username, password: password };
+
+    const response = await sendPostRequest('/user/login', postBody);
 
     document.getElementById('message').textContent = response.message;
 }

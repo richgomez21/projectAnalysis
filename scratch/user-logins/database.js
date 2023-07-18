@@ -10,11 +10,11 @@ const sequelize = new Sequelize({
 sequelize
     .authenticate()
     .then(() => {
-        console.log("Connection established")
+        console.log("Connection established");
     })
     .catch(err => {
-        console.log("Error connecting: ", err)
+        console.log("Error connecting: ", err);
     });
 
-//export the sequleize instance
+//export the sequelize instance
 module.exports = sequelize;

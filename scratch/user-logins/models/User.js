@@ -1,6 +1,5 @@
 const { DataTypes } = require('sequelize');
-//Instance of our database connection
-const sequelize = require('../database') // sequelize instance is in a file
+const sequelize = require('../database'); // sequelize instance is in a file called 'database.js'
 
 const User = sequelize.define('User', {
     username: {
@@ -15,4 +14,3 @@ const User = sequelize.define('User', {
 });
 
 module.exports = User;
-

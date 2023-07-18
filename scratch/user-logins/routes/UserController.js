@@ -4,14 +4,14 @@ const User = require('../models/User');
 
 const router = express.Router();
 
-router.get('/info',(req, res) => {
+router.get('/info', (req, res) => {
     if(req.session && req.session.user){
-        //^if true, there is a user loggin in
-        res.json({username: req.session.user.username})
+        //there is a user logged in
+        res.json({username: req.session.user.username});
     }else{
-        res.status(401).json({message: "User not logged in"});
+        res.status(401).json({message: 'User not logged in'});
     }
-})
+});
 
 // user registration
 router.post('/register', async (req, res) => {
@@ -42,38 +42,41 @@ router.post('/register', async (req, res) => {
 
 });
 
-// User Login Route
+//user login
 router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
+    // get data from post body
+    const username = req.body.username;
+    const password = req.body.password;
 
-    // Find user
-    const user = await User.findOne({ where: { username } });
-    if (!user) {
-        return res.status(404).json({ message: 'User not found' });
+    const user = await User.findOne({where: {username}});
+    if(!user){
+        return res.status(404).json({message: 'User not found'});
     }
 
-    // Check password
+    //check password
     const validPassword = await bcrypt.compare(password, user.password);
-    if (!validPassword) {
-        return res.status(401).json({ message: 'Invalid password' });
+    if(!validPassword){
+        return res.status(401).json({message: 'Invalid password'});
     }
 
-    // Initialize user session
+    //login the user
     req.session.user = user;
 
-    res.json({ message: 'Logged in successfully' });
+    res.json({message: 'Logged in successfully'});
+
 });
 
-// User Logout Route
+//user logout
 router.post('/logout', (req, res) => {
-    // Destroy the session
+    // destroy the session
     req.session.destroy((err) => {
-        if (err) {
-            return res.status(500).json({ message: 'Could not log out, please try again' });
-        } else {
-            return res.json({ message: 'Logged out successfully' });
+        if(err){
+            return res.status(500).json({message: 'Could not log out'});
+        }else{
+            return res.json({message: 'Logged out successfully'});
         }
     });
+
 });
 
 
