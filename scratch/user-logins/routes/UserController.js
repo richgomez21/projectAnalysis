@@ -1,6 +1,7 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
+const { compileClientWithDependenciesTracked } = require('jade');
 
 const router = express.Router();
 
@@ -64,6 +65,42 @@ router.post('/login', async (req, res) => {
 
     res.json({message: 'Logged in successfully'});
 
+});
+
+//User update
+router.put('/update', async (req, res) => {
+    console.log("reached update");
+
+    const username = req.body.username;
+    const password = req.body.password;
+
+    if(!req.session || !req.session.user){
+        return res.status(401).json({message: 'Not logged in'});
+    }
+    //find the user
+    const user = await User.findByPk(req.session.user.id);
+    if(!user){
+        return res.status(404).json({message: 'User not found'});
+    }
+    //update password
+    if(username){
+        user.username = username;
+    }
+    
+    if(password){
+        //change password
+
+        //hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        //set the users password to the new hashed password
+        user.password = hashedPassword;
+    }
+
+    //save the upadated user
+    await user.save();
+
+    res.json({message: 'updated successfully'})
+   
 });
 
 //user logout
