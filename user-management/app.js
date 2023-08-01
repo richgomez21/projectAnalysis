@@ -7,7 +7,24 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
+// this will execute the associations.js file
+require('./associations'); 
+// Sequelize database setup
+const sequelize = require('./database');
+// Interaction with session
+const session = require('express-session');
+
 var app = express();
+
+// Session middleware
+app.use(
+  session({
+    secret: 'your_session_secret',
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, maxAge: 3600000 }, // secure: true for HTTPS. Should be true in production. False here only for development.
+  })
+);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -26,6 +43,8 @@ sequelize.sync()
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+// app.use('/users', SeedController);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
