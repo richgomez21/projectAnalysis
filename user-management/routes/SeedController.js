@@ -5,19 +5,7 @@ const Role = require('../models/Role');
 
 const router = express.Router();
 
-const emailAddresses = [
-    'manager_a@example.com',
-    'manager_b@domain.com',
 
-    'susanroberts@website.net',
-    'johndoe@myweb.com',
-    'janedoe@example.net',
-    'bobsmith@domain.net',
-    'emmajohnson@webplace.com',
-    'oliviasmith@site.com',
-    'jamesbrown@web.com',
-    'marywilliams@website.net'
-];
 
 router.get('/', async (req, res) => {
     const TOT_NUM_USERS = 10;
@@ -41,6 +29,37 @@ router.get('/', async (req, res) => {
 						in which that User has. When you create your database, take a look at the tables created
 						and you should see a foreign key of roleId on the Users table.
 					*/
+
+    const emailAddresses = [
+        'manager_a@example.com',
+        'manager_b@domain.com',
+
+        'susanroberts@website.net',
+        'johndoe@myweb.com',
+        'janedoe@example.net',
+        'bobsmith@domain.net',
+        'emmajohnson@webplace.com',
+        'oliviasmith@site.com',
+        'jamesbrown@web.com',
+        'marywilliams@website.net'
+    ];
+
+    const managerRole = await Role.create({title: "Manager"});
+    const employeeRole = await Role.create({title: "Employee"});
+
+    for(let i = 0; i < TOT_NUM_USERS; i++){
+        if(i < 2){
+            const userManager = await User.create({username: emailAddresses[i], 
+                                                    password: await bcrypt.hash("123", 10), 
+                                                    isEmployed: true, 
+                                                    RoleId: managerRole.id});
+        }else{
+            const userEmployee = await User.create({username: emailAddresses[i],
+                                                    password: await bcrypt.hash("123", 10),
+                                                    isEmployed: true,
+                                                    RoleId: employeeRole.id});
+        }
+    }
             
 		        res.status(200).send('Database seeded successfully');
 

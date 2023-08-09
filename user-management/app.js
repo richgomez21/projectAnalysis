@@ -14,6 +14,10 @@ const sequelize = require('./database');
 // Interaction with session
 const session = require('express-session');
 
+const SeedController = require('./routes/SeedController');
+const UserController = require('./routes/UserController');
+const EmployeeController = require('./routes/EmployeeController');
+
 var app = express();
 
 // Session middleware
@@ -43,7 +47,9 @@ sequelize.sync()
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-// app.use('/users', SeedController);
+app.use('/seed', SeedController);
+app.use('/user', UserController);
+app.use('/employees', EmployeeController);
 
 
 // catch 404 and forward to error handler

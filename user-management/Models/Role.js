@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../database'); // sequelize instance is in a file called 'database.js'
+const sequelize = require('../database'); 
 
 const Role = sequelize.define('Role', {
     title: {
