@@ -8,7 +8,7 @@ updateForm.submitButton.disabled = true;
 function populateDropdown(user){
 	let option = document.createElement('option');
 	option.value = user.id
-	option.textContent = user.title
+	option.textContent = 
 	userSelect.appendChild(option);
 }
 
