@@ -6,7 +6,7 @@ async function logout() {
 };
     
     // Make request.
-const response = await fetch('/users/logout', requestObj);
+const response = await fetch('/user/logout', requestObj);
 
     // Check on response from server.
 if (response.ok) {
@@ -21,8 +21,8 @@ if (response.ok) {
 async function getData(){
 const messageElement = document.getElementById('message');
 
-// Send a GET request to the /users/info route
-const response = await fetch('/users/info');
+// Send a GET request to the /user/info route
+const response = await fetch('/user/info');
 
 if (response.ok) {
     // If the response is ok (status in the range 200-299), then the user is logged in

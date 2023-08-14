@@ -7,7 +7,7 @@ async function sendPostRequest(url, data) {
         headers: {
             'Content-Type': 'application/json'
         },
-        credentials: 'include', // Add this line to send cookies with the request
+        credentials: 'include',
         body: JSON.stringify(data)
     });
     return response.json();

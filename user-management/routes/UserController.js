@@ -33,7 +33,8 @@ router.post('/register', async (req, res) => {
 
     const newUser = await User.create({
         username: username,
-        password: hashedPassword
+        password: hashedPassword,
+        isEmployed: true
     });
 
     //initialize session (logging in user right away)

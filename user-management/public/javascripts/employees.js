@@ -1,11 +1,20 @@
+const User = require("../../models/User");
+
 const updateForm = document.getElementById('updateForm');
 const messageElement = document.getElementById('message');
 
 updateForm.submitButton.disabled = true;
 
+function populateDropdown(user){
+	let option = document.createElement('option');
+	option.value = user.id
+	option.textContent = user.title
+	userSelect.appendChild(option);
+}
+
 async function getEmployees(){    
 
-    // Send a GET request to the /user/info route
+    // Send a GET request to the /employees route
     const response = await fetch('/employees/');
 
     if (response.ok) {
@@ -14,8 +23,9 @@ async function getEmployees(){
         const employeeList = await response.json();
         const select = document.getElementById('employee-select');
         select.innerHTML = ""; // Clear out the select dropdown.
+		var option = document.createElement("option");
+		
 
-        // TODO: populate dropdown
 
     } else {
         // If the response is not ok, then there was an issue of some kind
@@ -55,6 +65,14 @@ async function getEmployeeData(){
 				1) Call setFormData() (making sure to pass in the employee returned from the server).
 				2) Allow the user to click the form's "update" button with: updateForm.submitButton.disabled = false;
 	*/
+	fetch('http://localhost:3000/users')
+	.then(response => response.json())
+	.then(users => {                          
+		users.forEach(user => {
+			populateDropdown(user);
+		});
+	})
+	.catch(error => console.error('Error:', error));
 }
 
 async function logout() {
@@ -122,7 +140,7 @@ async function updateEmployee(event){
 						const response = await sendPutData(<send in proper params>);
 
 			If the response variable is ok (response.ok), then messageElement
-			should be updated to say this.
+			should be updated to say that the user was updated.
 			Otherwise update the messageElement to say that the update failed and write
 			out the message in the response (response.message).
 		

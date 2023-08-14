@@ -15,27 +15,15 @@ const MANAGER_ROLE = 1;
 */
 
 function isLoggedIn(req){    
-    return req.User !== undefined;
+    return req.session && req.session.user;
 }
 
 function isLoggedInAndManager(req){    
-    return isLoggedIn(req) && req.user.role === MANAGER_ROLE;
+    return isLoggedIn(req) && req.session.user.role === MANAGER_ROLE;
 }
 
 async function updateUserFields(existingUser, newUserData){
-    if (newUserData.username !== undefined) {
-        existingUser.username = newUserData.username;
-    }
-    if (newUserData.email !== undefined) {
-        existingUser.email = newUserData.email;
-    }
-    if (newUserData.employmentStatus !== undefined) {
-        existingUser.employmentStatus = newUserData.employmentStatus;
-    }
-    if (newUserData.password !== undefined) {
-        const hashedPassword = await bcrypt.hash(newUserData.password, 10);
-        existingUser.password = hashedPassword;
-    }
+    
 }
 
 router.get('/', async (req, res) => {
@@ -62,28 +50,15 @@ router.get('/', async (req, res) => {
                 not a manager.
 
     */
-
-     try {
-        if (!isLoggedIn(req)) {
-            return res.status(401).json({ message: 'User not logged in' });
-        }
-
-        if (!isLoggedInAndManager(req)) {
-            return res.status(403).json({ message: 'User does not have permission' });
-        }
-
-        // Fetch all Users except the logged in one
-        const users = await User.findAll({
-            where: {
-                id: { [Op.ne]: req.user.id } // Assuming you have a user object in the request
-            }
-        });
-
-        return res.json(users);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Failed to fetch users' });
+   if(!isLoggedIn(req))
+    return res.status(401).json({message: 'User not logged in'});
+   
+    if(isLoggedInAndManager(req)){
+        return 
+    }else{
+        return res.status(401).json({message: 'User does not have permission to view this page'});
     }
+
 });
 
 router.get('/:id', async (req, res) => {
@@ -91,6 +66,9 @@ router.get('/:id', async (req, res) => {
     /*
         This endpoint is used when a User selects someone from the Employee
         dropdown menu. The :id will be the Employee to gather data on.
+				
+				You must **not** send down the user's password to the client. 
+				Just send down the other properties of the User, but not the password.
 
         Steps
         -------
@@ -109,26 +87,15 @@ router.get('/:id', async (req, res) => {
                     not logged in.
 
     */
-    try {
-        if (!isLoggedInAndManager(req)) {
-            return res.status(403).json({ message: 'User does not have permission' });
-        }
+   if(!isLoggedInAndManager(req))
+    return res.status(403).json({message: 'You do not have permission'})
+    const userId = req.params.id;
+    const user = await User.findAll({attributes: {exclude: ['password']}});
+if(!user)
+        return res.status(404).json({message: 'User not found'});
+    });
 
-        const userId = req.params.id;
-        const userFound = await User.findByPk(userId);
-
-        if (!userFound) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        return res.json(userFound);
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Failed to fetch user' });
-    }
-});
-
-router.put('/:id', async (req, res) => {
+    router.put('/:id', async (req, res) => {
 
     /*
         This is the route that is hit when the User with id of :id
@@ -175,25 +142,7 @@ router.put('/:id', async (req, res) => {
 
     */
     
-    try {
-        const userId = req.params.id;
-        const userFromPostBody = req.body;
 
-        const existingUser = await User.findByPk(userId);
-
-        if (!existingUser) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        await updateUserFields(existingUser, userFromPostBody);
-
-        await existingUser.save();
-
-        return res.json({ message: 'User updated successfully' });
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({ message: 'Failed to update employee' });
-    }
 });
 
 module.exports = router;
