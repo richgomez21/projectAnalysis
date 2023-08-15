@@ -23,7 +23,13 @@ async function getEmployees(){
         const employeeList = await response.json();
         const select = document.getElementById('employee-select');
         select.innerHTML = ""; // Clear out the select dropdown.
-		var option = document.createElement("option");
+		
+		employeeList.forEach(employee =>{
+			const option = document.createElement('option');
+			option.value = employee.id;
+			option.textContent = employee.username;
+			select.appendChild(option);
+		});
 		
 
 
@@ -50,6 +56,9 @@ function setFormData(employee){
 			so that the form has the employee values in it for the user to update.
 		
 		*/
+	const form = document.getElementById('updateForm');
+	form.id.value = employee.id;
+	form.username.value = employee.username;
 		
 }
 
@@ -65,14 +74,35 @@ async function getEmployeeData(){
 				1) Call setFormData() (making sure to pass in the employee returned from the server).
 				2) Allow the user to click the form's "update" button with: updateForm.submitButton.disabled = false;
 	*/
-	fetch('http://localhost:3000/users')
-	.then(response => response.json())
-	.then(users => {                          
-		users.forEach(user => {
-			populateDropdown(user);
-		});
-	})
-	.catch(error => console.error('Error:', error));
+
+	const selectedEmployeeId = document.getElementById('employee-select').value;
+    const response = await fetch(`/employees/${selectedEmployeeId}`);
+
+    if (response.ok) {
+        const employee = await response.json();
+        setFormData(employee);
+        updateForm.submitButton.disabled = false;
+    } else {
+        // Handle error
+    }
+
+	function getFormData() {
+		const form = document.getElementById('updateForm');
+		return {
+			id: form.id.value,
+			username: form.username.value,
+			// Get other form fields here...
+		};
+	}
+	
+	// fetch('http://localhost:3000/users')
+	// .then(response => response.json())
+	// .then(users => {                          
+	// 	users.forEach(user => {
+	// 		populateDropdown(user);
+	// 	});
+	// })
+	// .catch(error => console.error('Error:', error));
 }
 
 async function logout() {
@@ -145,7 +175,26 @@ async function updateEmployee(event){
 			out the message in the response (response.message).
 		
 		*/
-}
+		event.preventDefault();
+
+		const formData = getFormData();
+		const response = await sendPutData(`/employees/${formData.id}`, formData);
+	
+		if (response.ok) {
+			messageElement.classList.remove('bg-yellow-500');
+			messageElement.textContent = 'User updated successfully.';
+		} else {
+			messageElement.classList.add('bg-red-500');
+			messageElement.textContent = 'Update failed: ' + response.message;
+		}
+	}
+	
+	// Event listeners
+	
+	updateForm.addEventListener('submit', updateEmployee);
+	
+	// Call the logout function when logout button is clicked
+	document.getElementById('logoutButton').addEventListener('click', logout);
 
 (async function() {
     await getEmployees();

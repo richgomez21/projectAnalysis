@@ -50,14 +50,35 @@ router.get('/', async (req, res) => {
                 not a manager.
 
     */
-   if(!isLoggedIn(req))
-    return res.status(401).json({message: 'User not logged in'});
+    try {
+            if (!isLoggedInAndManager(req)) {
+                return res.status(403).json({ message: 'You do not have permission to view this page.' });
+            }
+
+            const loggedInUserId = req.user.id; 
+            const users = await User.findAll({
+                where: {
+                    id: {
+                        [Op.ne]: loggedInUserId
+                    }
+                },
+                attributes: ['id', 'username', 'email', 'employment_status'] 
+            });
+
+            res.json(users);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Failed to retrieve users' });
+        }
+    
+//    if(!isLoggedIn(req))
+//     return res.status(401).json({message: 'User not logged in'});
    
-    if(isLoggedInAndManager(req)){
-        return 
-    }else{
-        return res.status(401).json({message: 'User does not have permission to view this page'});
-    }
+//     if(isLoggedInAndManager(req)){
+//         return 
+//     }else{
+//         return res.status(401).json({message: 'User does not have permission to view this page'});
+//     }
 
 });
 
@@ -87,12 +108,33 @@ router.get('/:id', async (req, res) => {
                     not logged in.
 
     */
-   if(!isLoggedInAndManager(req))
-    return res.status(403).json({message: 'You do not have permission'})
-    const userId = req.params.id;
-    const user = await User.findAll({attributes: {exclude: ['password']}});
-if(!user)
-        return res.status(404).json({message: 'User not found'});
+
+    try {
+        if (!isLoggedInAndManager(req)) {
+            return res.status(403).json({ message: 'You do not have permission to view this page.' });
+        }
+
+        const userId = req.params.id;
+        const user = await User.findByPk(userId, {
+            attributes: { exclude: ['password'] } // Exclude password field from the response
+        });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.json(user);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to retrieve user' });
+    }
+                
+//    if(!isLoggedInAndManager(req))
+//     return res.status(403).json({message: 'You do not have permission'})
+//     const userId = req.params.id;
+//     const user = await User.findAll({attributes: {exclude: ['password']}});
+//     if(!user)
+//         return res.status(404).json({message: 'User not found'});
     });
 
     router.put('/:id', async (req, res) => {
@@ -141,7 +183,26 @@ if(!user)
         }
 
     */
-    
+
+    try {
+        const userId = req.params.id;
+        const existingUser = await User.findByPk(userId);
+
+        if (!existingUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const userFromPostBody = req.body;
+
+        await updateUserFields(existingUser, userFromPostBody);
+
+        await existingUser.save();
+
+        res.json({ message: 'User updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to update employee' });
+    }
 
 });
 
