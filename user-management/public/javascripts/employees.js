@@ -1,16 +1,12 @@
-const User = require("../../models/User");
 
 const updateForm = document.getElementById('updateForm');
 const messageElement = document.getElementById('message');
 
+
+
 updateForm.submitButton.disabled = true;
 
-function populateDropdown(user){
-	let option = document.createElement('option');
-	option.value = user.id
-	option.textContent = 
-	userSelect.appendChild(option);
-}
+
 
 async function getEmployees(){    
 
@@ -21,17 +17,14 @@ async function getEmployees(){
         // If the response is ok (status in the range 200-299), then the user 
         // is logged in & has permission to view this page
         const employeeList = await response.json();
-        const select = document.getElementById('employee-select');
+		const select = document.getElementById('employee-select');
         select.innerHTML = ""; // Clear out the select dropdown.
-		
-		employeeList.forEach(employee =>{
+		employeeList.forEach(employee => {
 			const option = document.createElement('option');
 			option.value = employee.id;
-			option.textContent = employee.username;
+			option.textContent = employee.username; 
 			select.appendChild(option);
 		});
-		
-
 
     } else {
         // If the response is not ok, then there was an issue of some kind
@@ -47,6 +40,7 @@ async function getEmployees(){
     }
 }
 
+
 function setFormData(employee){
     /* 
 			TODO: Implement.
@@ -56,9 +50,10 @@ function setFormData(employee){
 			so that the form has the employee values in it for the user to update.
 		
 		*/
-	const form = document.getElementById('updateForm');
-	form.id.value = employee.id;
-	form.username.value = employee.username;
+	
+	updateForm.employeeUsername.value = employee.username;
+	// updateForm.employeePassword.value = employee.id;
+	updateForm.isEmployed.checked = employee.isEmployed;
 		
 }
 
@@ -73,47 +68,30 @@ async function getEmployeeData(){
 			employee data was "ok", then we can:
 				1) Call setFormData() (making sure to pass in the employee returned from the server).
 				2) Allow the user to click the form's "update" button with: updateForm.submitButton.disabled = false;
-	*/
-
-	const selectedEmployeeId = document.getElementById('employee-select').value;
-    const response = await fetch(`/employees/${selectedEmployeeId}`);
-
-    if (response.ok) {
-        const employee = await response.json();
-        setFormData(employee);
-        updateForm.submitButton.disabled = false;
-    } else {
-        // Handle error
-    }
-
-	function getFormData() {
-		const form = document.getElementById('updateForm');
-		return {
-			id: form.id.value,
-			username: form.username.value,
-			// Get other form fields here...
-		};
-	}
 	
-	// fetch('http://localhost:3000/users')
-	// .then(response => response.json())
-	// .then(users => {                          
-	// 	users.forEach(user => {
-	// 		populateDropdown(user);
-	// 	});
-	// })
-	// .catch(error => console.error('Error:', error));
+				*/
+	const employeeSelect = document.getElementById("employee-select");
+	const employeeId = employeeSelect.value; 
+	console.log(employeeId);
+	const response = await fetch(`/employees/${employeeId}`);
+
+	if(response.ok){
+		const employee = await response.json();
+		console.log(employee);
+		setFormData(employee);
+		updateForm.submitButton.disabled = false;
+	}
 }
 
 async function logout() {
-		// Create request object to make a POST request.	
-		const requestObj = {
-        method: 'POST',
-        credentials: 'include', // This is necessary to include the session cookie with the request
-    };
+    // Create request object to make a POST request.	
+    const requestObj = {
+    method: 'POST',
+    credentials: 'include', // This is necessary to include the session cookie with the request
+};
 		
 		// Make request.
-    const response = await fetch('/users/logout', requestObj);
+    const response = await fetch('/user/logout', requestObj);
 	
 		// Check on response from server.
     if (response.ok) {
@@ -140,6 +118,20 @@ function getFormData(){
 			}
 
 		*/
+	
+    
+    const id = updateForm.querySelector('[name="id"]').value;
+    const username = updateForm.querySelector('[name="username"]').value;
+    const password = updateForm.querySelector('[name="password"]').value;
+    const isEmployed = updateForm.querySelector('[name="isEmployed"]').checked;
+
+    return {
+        id: id,
+        username: username,
+        password: password,
+        isEmployed: isEmployed,
+    };
+	
 }
 
 async function sendPutData(url, data){
@@ -157,44 +149,50 @@ async function sendPutData(url, data){
 }
 
 async function updateEmployee(event){     
-		event.preventDefault();
-		
-		/* 
-			TODO: Implement.
-			This is the function that is called when the updateForm is submitted.
-			1) Create an employee variable and set it equal to what is returned from
-					the gathering the form data.
-			
-			2) Call the sendPutData() function, making sure to pass in the proper parameters,
-					in order to send this data to the server.
-						const response = await sendPutData(<send in proper params>);
-
-			If the response variable is ok (response.ok), then messageElement
-			should be updated to say that the user was updated.
-			Otherwise update the messageElement to say that the update failed and write
-			out the message in the response (response.message).
-		
-		*/
-		event.preventDefault();
-
-		const formData = getFormData();
-		const response = await sendPutData(`/employees/${formData.id}`, formData);
+	event.preventDefault();
 	
+	/* 
+
+		TODO: Implement.
+		This is the function that is called when the updateForm is submitted.
+		1) Create an employee variable and set it equal to what is returned from
+				the gathering the form data.
+		
+		2) Call the sendPutData() function, making sure to pass in the proper parameters,
+				in order to send this data to the server.
+					const response = await sendPutData(<send in proper params>);
+
+		If the response variable is ok (response.ok), then messageElement
+		should be updated to say that the user was updated.
+		Otherwise update the messageElement to say that the update failed and write
+		out the message in the response (response.message).
+	
+	*/
+
+	try {
+		
+		const formData = new FormData(updateForm);
+		
+		const employee = {};
+		formData.forEach((value, key) => {
+			employee[key] = value;
+		});
+		
+		const response = await sendPutData(employee); 
+
 		if (response.ok) {
-			messageElement.classList.remove('bg-yellow-500');
-			messageElement.textContent = 'User updated successfully.';
+			messageElement.textContent = 'Employee updated successfully.';
 		} else {
-			messageElement.classList.add('bg-red-500');
-			messageElement.textContent = 'Update failed: ' + response.message;
+			const errorMessage = await response.json();
+			messageElement.textContent = `Update failed: ${errorMessage.message}`;
 		}
+
+	} catch (error) {
+		console.error(error)
+		messageElement.textContent = 'An error occurred while updating the employee.';
 	}
+}
 	
-	// Event listeners
-	
-	updateForm.addEventListener('submit', updateEmployee);
-	
-	// Call the logout function when logout button is clicked
-	document.getElementById('logoutButton').addEventListener('click', logout);
 
 (async function() {
     await getEmployees();

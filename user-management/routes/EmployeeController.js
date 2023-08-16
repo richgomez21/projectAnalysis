@@ -19,7 +19,7 @@ function isLoggedIn(req){
 }
 
 function isLoggedInAndManager(req){    
-    return isLoggedIn(req) && req.session.user.role === MANAGER_ROLE;
+    return isLoggedIn(req) && req.session.user.RoleId === MANAGER_ROLE;
 }
 
 async function updateUserFields(existingUser, newUserData){
@@ -50,35 +50,26 @@ router.get('/', async (req, res) => {
                 not a manager.
 
     */
-    try {
-            if (!isLoggedInAndManager(req)) {
-                return res.status(403).json({ message: 'You do not have permission to view this page.' });
-            }
-
-            const loggedInUserId = req.user.id; 
-            const users = await User.findAll({
-                where: {
-                    id: {
-                        [Op.ne]: loggedInUserId
-                    }
-                },
-                attributes: ['id', 'username', 'email', 'employment_status'] 
-            });
-
-            res.json(users);
-        } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Failed to retrieve users' });
-        }
     
-//    if(!isLoggedIn(req))
-//     return res.status(401).json({message: 'User not logged in'});
+    if(!isLoggedIn(req))
+        return res.status(401).json({message: 'User not logged in'});
    
-//     if(isLoggedInAndManager(req)){
-//         return 
-//     }else{
-//         return res.status(401).json({message: 'User does not have permission to view this page'});
-//     }
+    if(isLoggedInAndManager(req)){
+        const loggedInUser = req.session.user;
+        const users = await User.findAll({
+            where:{
+                id: {
+                    [Op.ne]: loggedInUser
+                }
+            },
+            attributes: ['id', 'username']
+        });
+        // console.log(users);
+        res.json(users)
+
+    }else{
+        return res.status(401).json({message: 'User does not have permission to view this page'});
+    }
 
 });
 
@@ -108,101 +99,85 @@ router.get('/:id', async (req, res) => {
                     not logged in.
 
     */
-
-    try {
-        if (!isLoggedInAndManager(req)) {
-            return res.status(403).json({ message: 'You do not have permission to view this page.' });
-        }
-
-        const userId = req.params.id;
-        const user = await User.findByPk(userId, {
-            attributes: { exclude: ['password'] } // Exclude password field from the response
-        });
-
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        res.json(user);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Failed to retrieve user' });
-    }
                 
-//    if(!isLoggedInAndManager(req))
-//     return res.status(403).json({message: 'You do not have permission'})
-//     const userId = req.params.id;
-//     const user = await User.findAll({attributes: {exclude: ['password']}});
-//     if(!user)
-//         return res.status(404).json({message: 'User not found'});
-    });
+    if(!isLoggedInAndManager(req))
+        return res.status(403).json({message: 'You do not have permission'})
 
-    router.put('/:id', async (req, res) => {
+    const userId = req.params.id;
+    const user = await User.findByPk(userId, {attributes: {exclude: ['password']}});
 
-    /*
-        This is the route that is hit when the User with id of :id
-        is updated with the data sent in the request body. Below, you
-        will notice that there is a try-catch block. This is code that 
-        should be left in.
-
-        Steps
-        -------
+    if(!user)
+        return res.status(404).json({message: 'User not found'});
+   
+    res.json(user);
     
-        1) Get the employee data out of the body of thre request.
+});
+
+router.put('/:id', async (req, res) => {
+
+    
+        // This is the route that is hit when the User with id of :id
+        // is updated with the data sent in the request body. Below, you
+        // will notice that there is a try-catch block. This is code that 
+        // should be left in.
+
+        // Steps
+        // -------
+    
+        // 1) Get the employee data out of the body of thre request.
 
         try{
+             const userFromPostBody = req.body;
 
-            2) Get the User with the id given in the path parameter.
+            // 2) Get the User with the id given in the path parameter.
+            const userId = req.params.id;
+            const existingUser = await User.findById(userId);
 
-            3) If that User does not exist:
-                    return an appropriate status code along with a message indicating
-                    that the desired User could not be found.
+            // 3) If that User does not exist:
+            //         return an appropriate status code along with a message indicating
+            //         that the desired User could not be found.
+            if (!existingUser) {
+                return res.status(404).json({ message: 'User not found' });
+            }
+            // 4) Update the User retrieved from the database with the data given from the client.
+            //     Keep in mind that the data given from the client *may not* be updating *all*
+            //     of the data on the User - for example, perhaps only the username was updated, or perhaps
+            //     only the employment status was updated. Therefore you must check which fields were
+            //     given by the client and only update those fields on the User retrieved from the database.
+            //         Hint: Look up how to iterate over the properties of an object to see if properties exist.
+            for (const key in userFromPostBody) {
+                if (userFromPostBody.hasOwnProperty(key)) {
+                    if (key === 'password') {
+                        const hashedPassword = await bcrypt.hash(userFromPostBody[key], 10);
+                        existingUser[key] = hashedPassword;
+                    } else {
+                        existingUser[key] = userFromPostBody[key];
+                    }
+                }
+            }
+            //     Also, remember that if the password is being updated, that you must *encrypt* that password before
+            //     saving it to the database. Bycrypt is also an asynchronous operation and thus must be awaited.
 
-            4) Update the User retrieved from the database with the data given from the client.
-                Keep in mind that the data given from the client *may not* be updating *all*
-                of the data on the User - for example, perhaps only the username was updated, or perhaps
-                only the employment status was updated. Therefore you must check which fields were
-                given by the client and only update those fields on the User retrieved from the database.
-                    Hint: Look up how to iterate over the properties of an object to see if properties exist.
+            //     For this step, I wrote a function and called it here like so:
 
-                Also, remember that if the password is being updated, that you must *encrypt* that password before
-                saving it to the database. Bycrypt is also an asynchronous operation and thus must be awaited.
+            //     await updateUserFields(existingUser, userFromPostBody);
 
-                For this step, I wrote a function and called it here like so:
+            // 5) Call the .save() method on the existingUser that was just updated. This is also an asynchronous
+            //     method that must be awaited.
+            await existingUser.save();
 
-                await updateUserFields(existingUser, userFromPostBody);
-
-            5) Call the .save() method on the existingUser that was just updated. This is also an asynchronous
-                method that must be awaited.
-
-            6) Send a response back saying that the User was updated successfully.
+            // 6) Send a response back saying that the User was updated successfully.
+            res.json({ message: 'User updated successfully' });
 
         }catch (error) {
             console.error(error);
             res.status(500).json({ message: 'Failed to update employee' });
         }
 
-    */
+    
+   
 
-    try {
-        const userId = req.params.id;
-        const existingUser = await User.findByPk(userId);
-
-        if (!existingUser) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        const userFromPostBody = req.body;
-
-        await updateUserFields(existingUser, userFromPostBody);
-
-        await existingUser.save();
-
-        res.json({ message: 'User updated successfully' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Failed to update employee' });
-    }
+    
 
 });
 
