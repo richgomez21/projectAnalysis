@@ -169,28 +169,28 @@ async function updateEmployee(event){
 	
 	*/
 
-	try {
+	// try {
 		
-		const formData = new FormData(updateForm);
+	// 	const formData = new FormData(updateForm);
 		
-		const employee = {};
-		formData.forEach((value, key) => {
-			employee[key] = value;
-		});
+	// 	const employee = {};
+	// 	formData.forEach((value, key) => {
+	// 		employee[key] = value;
+	// 	});
 		
-		const response = await sendPutData(employee); 
+	// 	const response = await sendPutData(employee); 
 
-		if (response.ok) {
-			messageElement.textContent = 'Employee updated successfully.';
-		} else {
-			const errorMessage = await response.json();
-			messageElement.textContent = `Update failed: ${errorMessage.message}`;
-		}
+	// 	if (response.ok) {
+	// 		messageElement.textContent = 'Employee updated successfully.';
+	// 	} else {
+	// 		const errorMessage = await response.json();
+	// 		messageElement.textContent = `Update failed: ${errorMessage.message}`;
+	// 	}
 
-	} catch (error) {
-		console.error(error)
-		messageElement.textContent = 'An error occurred while updating the employee.';
-	}
+	// } catch (error) {
+	// 	console.error(error)
+	// 	messageElement.textContent = 'An error occurred while updating the employee.';
+	// }
 }
 	
 

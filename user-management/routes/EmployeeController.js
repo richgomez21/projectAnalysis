@@ -126,53 +126,53 @@ router.put('/:id', async (req, res) => {
     
         // 1) Get the employee data out of the body of thre request.
 
-        try{
-             const userFromPostBody = req.body;
+        // try{
+        //      const userFromPostBody = req.body;
 
-            // 2) Get the User with the id given in the path parameter.
-            const userId = req.params.id;
-            const existingUser = await User.findById(userId);
+        //     // 2) Get the User with the id given in the path parameter.
+        //     const userId = req.params.id;
+        //     const existingUser = await User.findById(userId);
 
-            // 3) If that User does not exist:
-            //         return an appropriate status code along with a message indicating
-            //         that the desired User could not be found.
-            if (!existingUser) {
-                return res.status(404).json({ message: 'User not found' });
-            }
-            // 4) Update the User retrieved from the database with the data given from the client.
-            //     Keep in mind that the data given from the client *may not* be updating *all*
-            //     of the data on the User - for example, perhaps only the username was updated, or perhaps
-            //     only the employment status was updated. Therefore you must check which fields were
-            //     given by the client and only update those fields on the User retrieved from the database.
-            //         Hint: Look up how to iterate over the properties of an object to see if properties exist.
-            for (const key in userFromPostBody) {
-                if (userFromPostBody.hasOwnProperty(key)) {
-                    if (key === 'password') {
-                        const hashedPassword = await bcrypt.hash(userFromPostBody[key], 10);
-                        existingUser[key] = hashedPassword;
-                    } else {
-                        existingUser[key] = userFromPostBody[key];
-                    }
-                }
-            }
-            //     Also, remember that if the password is being updated, that you must *encrypt* that password before
-            //     saving it to the database. Bycrypt is also an asynchronous operation and thus must be awaited.
+        //     // 3) If that User does not exist:
+        //     //         return an appropriate status code along with a message indicating
+        //     //         that the desired User could not be found.
+        //     if (!existingUser) {
+        //         return res.status(404).json({ message: 'User not found' });
+        //     }
+        //     // 4) Update the User retrieved from the database with the data given from the client.
+        //     //     Keep in mind that the data given from the client *may not* be updating *all*
+        //     //     of the data on the User - for example, perhaps only the username was updated, or perhaps
+        //     //     only the employment status was updated. Therefore you must check which fields were
+        //     //     given by the client and only update those fields on the User retrieved from the database.
+        //     //         Hint: Look up how to iterate over the properties of an object to see if properties exist.
+        //     for (const key in userFromPostBody) {
+        //         if (userFromPostBody.hasOwnProperty(key)) {
+        //             if (key === 'password') {
+        //                 const hashedPassword = await bcrypt.hash(userFromPostBody[key], 10);
+        //                 existingUser[key] = hashedPassword;
+        //             } else {
+        //                 existingUser[key] = userFromPostBody[key];
+        //             }
+        //         }
+        //     }
+        //     //     Also, remember that if the password is being updated, that you must *encrypt* that password before
+        //     //     saving it to the database. Bycrypt is also an asynchronous operation and thus must be awaited.
 
-            //     For this step, I wrote a function and called it here like so:
+        //     //     For this step, I wrote a function and called it here like so:
 
-            //     await updateUserFields(existingUser, userFromPostBody);
+        //     //     await updateUserFields(existingUser, userFromPostBody);
 
-            // 5) Call the .save() method on the existingUser that was just updated. This is also an asynchronous
-            //     method that must be awaited.
-            await existingUser.save();
+        //     // 5) Call the .save() method on the existingUser that was just updated. This is also an asynchronous
+        //     //     method that must be awaited.
+        //     await existingUser.save();
 
-            // 6) Send a response back saying that the User was updated successfully.
-            res.json({ message: 'User updated successfully' });
+        //     // 6) Send a response back saying that the User was updated successfully.
+        //     res.json({ message: 'User updated successfully' });
 
-        }catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Failed to update employee' });
-        }
+        // }catch (error) {
+        //     console.error(error);
+        //     res.status(500).json({ message: 'Failed to update employee' });
+        // }
 
     
    
